@@ -11,8 +11,9 @@
     <groupId>top.zff06</groupId>
     <artifactId>backend-learning</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>backend-learning</name>
-    <description>backend-learning</description>
+    <description>后端工程化多模块学习仓库</description>
     <url/>
     <licenses>
         <license/>
@@ -20,6 +21,10 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>01-quickstart</module>
+        <module>02-config</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>
@@ -27,7 +32,9 @@
         <url/>
     </scm>
     <properties>
-        <java.version>17</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
