@@ -1,9 +1,47 @@
 server:
-  port: 9999
-
+  port: 8002
 spring:
   application:
-    name: 配置管理
+    name: 02-配置管理
+  profiles:
+    active: dev
+
+app:
+  name: 配置管理模块
+  author: ${zff06.name}
+  port: 8002
+  max-count: 100
+
 zff06:
   name: 张非凡
   job: 学生
+
+student:
+  name: 张非凡
+  age: 20
+  # 列表：短横线 + 空格
+  hobbies:
+    - 打篮球
+    - 听音乐
+    - 写代码
+    - 阅读
+  # Map：键值对，键名对应 StudentPropertiesTest 里 get("Chinese")
+  scores:
+    Chinese: 92
+    Math: 98
+    English: 88
+    Physics: 90
+  # 对象：嵌套缩进，对应静态内部类 Address
+  address:
+    province: 河南省
+    city: 郑州市
+  # 对象列表：对应静态内部类 Course
+  courses:
+    - name: Java程序设计
+      credit: 4
+    - name: 数据结构
+      credit: 3
+    - name: 计算机网络
+      credit: 3
+    - name: 数据库原理
+      credit: 4
