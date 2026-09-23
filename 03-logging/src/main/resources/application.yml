@@ -1,0 +1,38 @@
+server:
+  port: 8003
+spring:
+  application:
+    name: 03-日志管理
+  profiles:
+    active: dev
+  output:
+    ansi:
+      enabled: always
+logging:
+  # ---------- 1. 日志级别 ----------
+  # 从低到高：trace < debug < info < warn < error
+  # 只有 >= 配置级别的日志才会输出；root 默认就是 info
+  level:
+    root: INFO
+    # 自己的包设为 debug：可以看到 demo 接口里的 debug 日志
+    # 想看 trace 就把 debug 改成 trace
+    top.zff06.logging: debug
+
+  # ---------- 2. 控制台输出格式个性化 ----------
+  # 常用占位符：
+  #   %d{格式}      时间
+  #   %-5level      级别，固定 5 位宽度（- 表示左对齐，不足补空格）
+  #   %thread       线程名
+  #   %logger{30}   记录器名（包名+类名），超长时按包名缩写压缩到 30 字符
+  #   %msg          日志内容
+  #   %n            换行
+  # 颜色占位符：
+  #   %highlight()  按级别自动配色（ERROR 红 / WARN 黄 / INFO 绿 / DEBUG 蓝）
+  #   %clr(内容, 颜色)   指定颜色：blue cyan faint green magenta red yellow
+  #   %boldMagenta() / %boldBlue() 等加粗写法
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%msg){cyan} %highlight(%-5level){FATAL=red, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=blue, TRACE=magenta} [%thread] %boldMagenta(%logger{30}) : %msg%n"
+
+  # Windows 控制台中文乱码兜底
+  charset:
+    console: UTF-8
