@@ -10,5 +10,5 @@ import top.zff06.mybatis.entity.User;
  * @description UserMapper
  **/
 @Mapper
-public interface UserMapper extends BaseMapper<User>{
+public interface UserMapper extends BaseMapper<User> {
 }
