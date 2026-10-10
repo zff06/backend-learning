@@ -6005,3 +6005,35 @@ java.lang.Throwable: Runtime.exit(130)
 2026-09-23 10:11:55.008 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - Started LoggingApplication in 0.892 seconds (process running for 1.259)
 2026-09-23 10:15:50.483 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown [] - Commencing graceful shutdown. Waiting for active requests to complete
 2026-09-23 10:15:50.487 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown [] - Graceful shutdown complete
+2026-09-23 13:42:18.539 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - Starting LoggingApplication using Java 21.0.12.1 with PID 28748 (D:\Tools\Projects\backend-learning\03-logging\target\classes started by zff06 in D:\Tools\Projects\backend-learning)
+2026-09-23 13:42:18.541 [restartedMain] DEBUG t.zff06.logging.LoggingApplication [] - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-09-23 13:42:18.542 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - The following 1 profile is active: "dev"
+2026-09-23 13:42:18.568 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-09-23 13:42:18.568 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor [] - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-09-23 13:42:18.991 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer [] - Tomcat initialized with port 8003 (http)
+2026-09-23 13:42:19.002 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [] - Initializing ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:42:19.003 [restartedMain] INFO  o.a.catalina.core.StandardService [] - Starting service [Tomcat]
+2026-09-23 13:42:19.003 [restartedMain] INFO  o.a.catalina.core.StandardEngine [] - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-09-23 13:42:19.027 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer [] - Root WebApplicationContext: initialization completed in 459 ms
+2026-09-23 13:42:19.214 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [] - Starting ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:42:19.226 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer [] - Tomcat started on port 8003 (http) with context path '/'
+2026-09-23 13:42:19.229 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - Started LoggingApplication in 1.023 seconds (process running for 2.181)
+2026-09-23 13:52:46.969 [File Watcher] INFO  o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener [] - Restarting due to 4 class path changes (0 additions, 0 deletions, 4 modifications)
+2026-09-23 13:52:46.972 [Thread-1] INFO  o.s.boot.tomcat.GracefulShutdown [] - Commencing graceful shutdown. Waiting for active requests to complete
+2026-09-23 13:52:46.973 [tomcat-shutdown] INFO  o.a.coyote.http11.Http11NioProtocol [] - Pausing ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:52:46.976 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown [] - Graceful shutdown complete
+2026-09-23 13:52:46.977 [Thread-1] INFO  o.a.coyote.http11.Http11NioProtocol [] - Stopping ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:52:47.023 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - Starting LoggingApplication using Java 21.0.12.1 with PID 28748 (D:\Tools\Projects\backend-learning\03-logging\target\classes started by zff06 in D:\Tools\Projects\backend-learning)
+2026-09-23 13:52:47.023 [restartedMain] DEBUG t.zff06.logging.LoggingApplication [] - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-09-23 13:52:47.023 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - The following 1 profile is active: "dev"
+2026-09-23 13:52:47.111 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer [] - Tomcat initialized with port 8003 (http)
+2026-09-23 13:52:47.112 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [] - Initializing ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:52:47.112 [restartedMain] INFO  o.a.catalina.core.StandardService [] - Starting service [Tomcat]
+2026-09-23 13:52:47.113 [restartedMain] INFO  o.a.catalina.core.StandardEngine [] - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-09-23 13:52:47.123 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer [] - Root WebApplicationContext: initialization completed in 98 ms
+2026-09-23 13:52:47.167 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol [] - Starting ProtocolHandler ["http-nio-8003"]
+2026-09-23 13:52:47.169 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer [] - Tomcat started on port 8003 (http) with context path '/'
+2026-09-23 13:52:47.171 [restartedMain] INFO  t.zff06.logging.LoggingApplication [] - Started LoggingApplication in 0.166 seconds (process running for 630.123)
+2026-09-23 13:52:47.172 [restartedMain] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener [] - Condition evaluation unchanged
+2026-09-23 14:10:49.142 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown [] - Commencing graceful shutdown. Waiting for active requests to complete
+2026-09-23 14:10:49.145 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown [] - Graceful shutdown complete
