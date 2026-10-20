@@ -33,3 +33,20 @@ VALUES (1, 'admin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923ad
         2, 22, 'SILVER', 1500, 640.00, 4.0, '13800000006', 'sunqi@mqxu.top', 'https://cdn.mqxu.top/a/sunqi.png',
         '这条记录 status=0，用来演示按状态过滤。', '["测试","产品"]', '2004-09-30', '09:15:00', 0, 0,
         '2026-10-01 12:00:00', '2026-09-18 10:45:00', '2026-10-01 12:00:00', 0, 0);
+
+-- 课程表初始化数据：3 条典型记录，用于练习 saveBatch（批量新增）与 removeByIds（按 id 批量删除）
+-- t_course 没有 deleted 列，这里的删除是物理删除，和 t_user 的逻辑删除形成对比
+-- id 显式指定，方便演示 removeByIds 时直接知道要删哪几条
+-- stock 是练习5（下单扣库存）的库存字段，给足余量方便演示"库存足够"与"库存不足"两种路径
+INSERT INTO t_course (id, name, teacher, credit, stock)
+VALUES (1, 'Java 程序设计', '张伟', 4, 100),
+       (2, 'Spring Boot 实战', '李明', 3, 50),
+       (3, 'MySQL 数据库原理', '王芳', 2, 30);
+
+-- 订单表初始化数据：3 条典型记录
+-- amount = 学分 × 99 × 数量；create_time / update_time 是 NOT NULL，脚本里必须显式给值
+-- id=3 这条 deleted=1，用来演示逻辑删除后查询查不到、但物理行仍在
+INSERT INTO t_order (id, order_no, course_id, quantity, amount, status, create_time, update_time, deleted)
+VALUES (1, 'ORD20261001A001', 1, 2, 792.00, 1, '2026-10-01 10:15:00', '2026-10-01 10:15:00', 0),
+       (2, 'ORD20261002B002', 2, 1, 297.00, 0, '2026-10-02 14:30:00', '2026-10-02 14:30:00', 0),
+       (3, 'ORD20261003C003', 3, 3, 594.00, 1, '2026-10-03 09:05:00', '2026-10-03 09:05:00', 1);

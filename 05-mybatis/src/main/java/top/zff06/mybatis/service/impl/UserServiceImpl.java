@@ -107,6 +107,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public boolean modifyEmailByUsername(String username, String email) {
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(email)) {
+            throw new IllegalArgumentException("用户名和邮箱不能为空");
+        }
+        return update(new LambdaUpdateWrapper<User>()
+                .eq(User::getUsername, username)
+                .set(User::getEmail, email));
+
+    }
+
+    @Override
     public User getUser(Long id) {
         return getById(id);
     }

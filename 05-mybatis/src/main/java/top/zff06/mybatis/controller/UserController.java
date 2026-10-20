@@ -2,6 +2,7 @@ package top.zff06.mybatis.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import top.zff06.mybatis.dto.UserQuery;
 import top.zff06.mybatis.entity.User;
@@ -95,12 +96,25 @@ public class UserController {
         return userService.statistics();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @GetMapping("/slow")
+    public String slow() throws InterruptedException {
+        userService.list();          // 拿一次连接
+        Thread.sleep(3000);          // 事务未提交，连接一直被占
+        return "done";
+    }
+
     /* 改 */
     @PutMapping("/{id}")
     public User update(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
         userService.modifyUser(user);
         return userService.getUser(id);
+    }
+
+    @PutMapping("/email")
+    public boolean updateEmail(@RequestParam String username, @RequestParam String email) {
+        return userService.modifyEmailByUsername(username, email);
     }
 
     @PutMapping("/{id}/status")

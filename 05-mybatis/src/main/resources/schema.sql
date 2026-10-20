@@ -39,3 +39,33 @@ CREATE TABLE t_user
     KEY idx_status_gender (status, gender)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
+
+
+DROP TABLE IF EXISTS t_course;
+CREATE TABLE t_course
+(
+    id      BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键',
+    name    VARCHAR(50)      NOT NULL COMMENT '课程名',
+    teacher VARCHAR(50)      NOT NULL COMMENT '授课教师',
+    credit  TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '学分',
+    stock   INT              NOT NULL DEFAULT 0 COMMENT '库存',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_name (name)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '课程表';
+
+
+DROP TABLE IF EXISTS t_order;
+CREATE TABLE t_order
+(
+    id          BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键',
+    order_no    VARCHAR(32)      NOT NULL COMMENT '订单号',
+    course_id   BIGINT UNSIGNED  NOT NULL COMMENT '课程 id',
+    quantity    INT              NOT NULL DEFAULT 1 COMMENT '购买数量',
+    amount      DECIMAL(10, 2)   NOT NULL DEFAULT 0.00 COMMENT '订单金额',
+    status      TINYINT          NOT NULL DEFAULT 1 COMMENT '状态，1 待支付',
+    create_time DATETIME         NOT NULL COMMENT '创建时间，自动填充',
+    update_time DATETIME         NOT NULL COMMENT '更新时间，自动填充',
+    deleted     TINYINT          NOT NULL DEFAULT 0 COMMENT '逻辑删除，0 未删 / 1 已删',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_order_no (order_no)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '订单表';
