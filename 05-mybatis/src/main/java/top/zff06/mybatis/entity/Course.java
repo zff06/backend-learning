@@ -18,7 +18,7 @@ public class Course {
     private String name;
     private String teacher;
     private Integer credit;
-    /** 库存，练习5 下单时用 ge(stock, quantity) 做乐观条件扣减 */
-    private Integer stock;
 
+    /** 库存，下单扣减用（t_course.stock） */
+    private Integer stock;
 }

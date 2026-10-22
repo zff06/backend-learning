@@ -1,2 +1,26 @@
 server:
   port: 8008
+
+spring:
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 2395006165@qq.com
+    password: hsqkfpipmundeaff
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+weather:
+  api:
+    key: 0c618fea99904f8b9dda12b034c84f3d
+    city: 101190101
+    url:  https://mp3p44maup.re.qweatherapi.com/v7/weather/3d
+
+# 多个收件人用逗号分隔，@Value 注入 String[] 时会自动按逗号拆分
+email:
+  recipients: 3238951418@qq.com

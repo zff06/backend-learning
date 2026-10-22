@@ -44,28 +44,43 @@ CREATE TABLE t_user
 DROP TABLE IF EXISTS t_course;
 CREATE TABLE t_course
 (
-    id      BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键',
-    name    VARCHAR(50)      NOT NULL COMMENT '课程名',
-    teacher VARCHAR(50)      NOT NULL COMMENT '授课教师',
-    credit  TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '学分',
-    stock   INT              NOT NULL DEFAULT 0 COMMENT '库存',
+    id      bigint unsigned  NOT NULL AUTO_INCREMENT COMMENT '主键',
+    name    varchar(64)      NOT NULL COMMENT '课程名',
+    teacher varchar(32)               DEFAULT NULL COMMENT '授课教师',
+    credit  tinyint unsigned NOT NULL DEFAULT '0' COMMENT '学分',
+    stock   INT              NOT NULL DEFAULT 0 COMMENT '库存，下单扣减用',
     PRIMARY KEY (id),
     UNIQUE KEY uk_name (name)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '课程表';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4 COMMENT ='课程表';
 
-
-DROP TABLE IF EXISTS t_order;
-CREATE TABLE t_order
+DROP TABLE IF EXISTS t_student;
+CREATE TABLE t_student
 (
     id          BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键',
-    order_no    VARCHAR(32)      NOT NULL COMMENT '订单号',
-    course_id   BIGINT UNSIGNED  NOT NULL COMMENT '课程 id',
-    quantity    INT              NOT NULL DEFAULT 1 COMMENT '购买数量',
-    amount      DECIMAL(10, 2)   NOT NULL DEFAULT 0.00 COMMENT '订单金额',
-    status      TINYINT          NOT NULL DEFAULT 1 COMMENT '状态，1 待支付',
-    create_time DATETIME         NOT NULL COMMENT '创建时间，自动填充',
-    update_time DATETIME         NOT NULL COMMENT '更新时间，自动填充',
-    deleted     TINYINT          NOT NULL DEFAULT 0 COMMENT '逻辑删除，0 未删 / 1 已删',
+    name        VARCHAR(32)        NOT NULL COMMENT '姓名',
+    gender      TINYINT            NOT NULL DEFAULT 0 COMMENT '性别，0 未知 / 1 男 / 2 女',
+    age         TINYINT UNSIGNED COMMENT '年龄',
+    class_name  VARCHAR(32)        NOT NULL COMMENT '班级',
+    create_time DATETIME           NOT NULL COMMENT '创建时间，自动填充',
+    update_time DATETIME           NOT NULL COMMENT '更新时间，自动填充',
+    deleted     TINYINT            NOT NULL DEFAULT 0 COMMENT '逻辑删除，0 未删除 / 1 已删除',
     PRIMARY KEY (id),
-    UNIQUE KEY uk_order_no (order_no)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '订单表';
+    KEY idx_class_name (class_name)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='学生表';
+
+DROP TABLE IF EXISTS t_score;
+CREATE TABLE t_score
+(
+    id          BIGINT UNSIGNED AUTO_INCREMENT COMMENT '主键',
+    student_id  BIGINT UNSIGNED NOT NULL COMMENT '学生 id，对应 t_student.id',
+    course_id   BIGINT UNSIGNED NOT NULL COMMENT '课程 id，对应 t_course.id',
+    score       DECIMAL(5, 2)   NOT NULL DEFAULT 0.00 COMMENT '分数',
+    create_time DATETIME        NOT NULL COMMENT '创建时间，自动填充',
+    update_time DATETIME        NOT NULL COMMENT '更新时间，自动填充',
+    deleted     TINYINT         NOT NULL DEFAULT 0 COMMENT '逻辑删除，0 未删除 / 1 已删除',
+    PRIMARY KEY (id),
+    KEY idx_student_id (student_id),
+    KEY idx_course_id (course_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='成绩表';
+
