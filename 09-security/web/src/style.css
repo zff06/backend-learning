@@ -1,0 +1,106 @@
+/* 全局基础样式：浅灰底 + 白卡片 + 蓝色主按钮，统一在这里收着 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: #f5f6fa;
+  color: #1f2430;
+  font-size: 14px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d9dce3;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #1f2430;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #3b5bfd;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 88px;
+}
+
+.btn-primary {
+  background: #3b5bfd;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  background: #2f4ae0;
+}
+
+.btn-plain {
+  background: #fff;
+  color: #1f2430;
+  border: 1px solid #d9dce3;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+.btn-danger {
+  background: #fff1f0;
+  color: #e5484d;
+  border: 1px solid #ffd6d4;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.btn-small {
+  background: #fff;
+  color: #3b5bfd;
+  border: 1px solid #c9d4ff;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.btn-small:disabled {
+  color: #9aa2b1;
+  border-color: #e0e3ea;
+  cursor: not-allowed;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  color: #5a6172;
+  margin: 14px 0 6px;
+}
+
+.field-label:first-of-type {
+  margin-top: 0;
+}
