@@ -1,0 +1,646 @@
+{
+  "components": {
+    "schemas": {
+      "Book": {
+        "description": "图书",
+        "properties": {
+          "author": {
+            "description": "作者",
+            "example": "周志明",
+            "type": "string"
+          },
+          "id": {
+            "description": "图书 id，自增",
+            "example": 1,
+            "format": "int64",
+            "readOnly": true,
+            "type": "integer"
+          },
+          "isbn": {
+            "description": "ISBN（13 位，唯一）",
+            "example": "9787111641247",
+            "type": "string"
+          },
+          "price": {
+            "description": "价格，单位元，最多两位小数",
+            "example": 129.0,
+            "format": "double",
+            "type": "number"
+          },
+          "status": {
+            "description": "图书状态",
+            "enum": [
+              "ON_SALE",
+              "OFF_SHELF",
+              "SOLD_OUT"
+            ],
+            "example": "ON_SALE",
+            "type": "string"
+          },
+          "stock": {
+            "description": "库存",
+            "example": 20,
+            "format": "int32",
+            "type": "integer"
+          },
+          "title": {
+            "description": "书名",
+            "example": "深入理解 Java 虚拟机",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "BookPageResult": {
+        "properties": {
+          "code": {
+            "description": "业务状态码，200 表示成功",
+            "example": 200,
+            "format": "int32",
+            "type": "integer"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageResultBook",
+            "description": "业务数据，失败时为 null"
+          },
+          "message": {
+            "description": "提示信息",
+            "example": "success",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BookResult": {
+        "properties": {
+          "code": {
+            "description": "业务状态码，200 表示成功",
+            "example": 200,
+            "format": "int32",
+            "type": "integer"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Book",
+            "description": "业务数据，失败时为 null"
+          },
+          "message": {
+            "description": "提示信息",
+            "example": "success",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "BookSaveRequest": {
+        "description": "新增 / 修改图书请求体",
+        "properties": {
+          "author": {
+            "description": "作者",
+            "example": "周志明",
+            "maxLength": 20,
+            "minLength": 0,
+            "type": "string"
+          },
+          "isbn": {
+            "description": "ISBN，13 位数字，全局唯一",
+            "example": "9787111641247",
+            "minLength": 1,
+            "pattern": "^\\d{13}$",
+            "type": "string"
+          },
+          "price": {
+            "description": "价格，单位元",
+            "example": 129.0,
+            "minimum": 0.01,
+            "type": "number"
+          },
+          "status": {
+            "description": "图书状态，不传默认 ON_SALE",
+            "enum": [
+              "ON_SALE",
+              "OFF_SHELF",
+              "SOLD_OUT"
+            ],
+            "example": "ON_SALE",
+            "type": "string"
+          },
+          "stock": {
+            "description": "库存",
+            "example": 20,
+            "format": "int32",
+            "maximum": 99999,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": {
+            "description": "书名",
+            "example": "深入理解 Java 虚拟机",
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          }
+        },
+        "required": [
+          "author",
+          "isbn",
+          "price",
+          "stock",
+          "title"
+        ],
+        "type": "object"
+      },
+      "PageResultBook": {
+        "description": "分页结果",
+        "properties": {
+          "list": {
+            "description": "当前页数据",
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            },
+            "type": "array"
+          },
+          "pageNum": {
+            "description": "页码",
+            "example": 1,
+            "format": "int32",
+            "type": "integer"
+          },
+          "pageSize": {
+            "description": "每页条数",
+            "example": 10,
+            "format": "int32",
+            "type": "integer"
+          },
+          "total": {
+            "description": "总条数",
+            "example": 3,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "ResultMapStringObject": {
+        "description": "统一响应体",
+        "properties": {
+          "code": {
+            "description": "业务状态码，200 表示成功",
+            "example": 200,
+            "format": "int32",
+            "type": "integer"
+          },
+          "data": {
+            "additionalProperties": {},
+            "description": "业务数据，失败时为 null",
+            "type": "object"
+          },
+          "message": {
+            "description": "提示信息",
+            "example": "success",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "VoidResult": {
+        "properties": {
+          "code": {
+            "description": "业务状态码，200 表示成功",
+            "example": 200,
+            "format": "int32",
+            "type": "integer"
+          },
+          "data": {
+            "description": "业务数据，失败时为 null"
+          },
+          "message": {
+            "description": "提示信息",
+            "example": "success",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "description": "登录接口拿到的 JWT，直接粘 token 本体",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "email": "2395006165@qq.com",
+      "name": "zff06"
+    },
+    "description": "模块 10 接口文档综合练习。\n\n**调用约定**\n1. 所有接口返回统一响应体 `Result<T>`，业务成功看 `code == 200`\n2. 需要登录的接口请在右上角 Authorize 里填入 token（不带 `Bearer ` 前缀）\n3. 文档地址仅开发环境开放，生产环境关闭\n",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "title": "图书服务接口文档",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/books": {
+      "get": {
+        "description": "按书名 / 作者关键字模糊匹配，可按状态过滤。注意：查询对象必须加 @ParameterObject，否则页面上只显示一个 bookQuery 复合参数。",
+        "operationId": "page",
+        "parameters": [
+          {
+            "description": "书名 / 作者关键字，模糊匹配",
+            "example": "Java",
+            "in": "query",
+            "name": "keyword",
+            "required": false,
+            "schema": {
+              "description": "书名 / 作者关键字，模糊匹配",
+              "example": "Java",
+              "type": "string"
+            }
+          },
+          {
+            "description": "图书状态，不传表示全部",
+            "example": "ON_SALE",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "description": "图书状态",
+              "enum": [
+                "ON_SALE",
+                "OFF_SHELF",
+                "SOLD_OUT"
+              ],
+              "example": "ON_SALE",
+              "type": "string"
+            }
+          },
+          {
+            "description": "页码，从 1 开始",
+            "example": 1,
+            "in": "query",
+            "name": "pageNum",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "description": "页码，从 1 开始",
+              "example": 1,
+              "format": "int32",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "每页条数，1~100",
+            "example": 10,
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "description": "每页条数，1~100",
+              "example": 10,
+              "format": "int32",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookPageResult"
+                }
+              }
+            },
+            "description": "查询成功"
+          }
+        },
+        "summary": "分页查询图书",
+        "tags": [
+          "图书管理"
+        ]
+      },
+      "post": {
+        "description": "ISBN 全局唯一，重复返回 code=30002",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "新增一本 Java 书": {
+                  "description": "新增一本 Java 书",
+                  "value": {
+                    "author": "Cay S. Horstmann",
+                    "isbn": "9787111636663",
+                    "price": 149.0,
+                    "status": "ON_SALE",
+                    "stock": 30,
+                    "title": "Java 核心技术"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/BookSaveRequest"
+              }
+            }
+          },
+          "description": "图书信息，注意这里是 swagger 的 @RequestBody，不是 Spring 的那个",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookResult"
+                }
+              }
+            },
+            "description": "新增成功"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "ISBN 重复": {
+                    "description": "ISBN 重复",
+                    "value": {
+                      "code": 30002,
+                      "data": null,
+                      "message": "ISBN 已存在"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "参数校验失败 / ISBN 重复"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "新增图书",
+        "tags": [
+          "图书管理"
+        ]
+      }
+    },
+    "/books/boom": {
+      "get": {
+        "deprecated": true,
+        "description": "仅用于演示 5xx 响应在文档里的呈现。已废弃，不要在新代码里调用，改调用 /books/{id}。",
+        "operationId": "boom",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "正常情况下不会走到这里"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "系统异常": {
+                    "description": "系统异常",
+                    "value": {
+                      "code": 500,
+                      "data": null,
+                      "message": "系统繁忙，请稍后再试"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "服务端异常（code=50000）"
+          }
+        },
+        "summary": "【已废弃】触发一次 500",
+        "tags": [
+          "图书管理"
+        ]
+      }
+    },
+    "/books/{id}": {
+      "delete": {
+        "description": "物理删除，id 不存在返回 code=30001",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "description": "图书 id",
+            "example": 1,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "删除成功"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "图书不存在"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "删除图书",
+        "tags": [
+          "图书管理"
+        ]
+      },
+      "get": {
+        "operationId": "get",
+        "parameters": [
+          {
+            "description": "图书 id",
+            "example": 1,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookResult"
+                }
+              }
+            },
+            "description": "查询成功"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "图书不存在": {
+                    "description": "图书不存在",
+                    "value": {
+                      "code": 30001,
+                      "data": null,
+                      "message": "图书不存在"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "图书不存在（code=30001）"
+          }
+        },
+        "summary": "按 id 查询图书",
+        "tags": [
+          "图书管理"
+        ]
+      },
+      "put": {
+        "description": "全量覆盖，id 不存在返回 code=30001",
+        "operationId": "update",
+        "parameters": [
+          {
+            "description": "图书 id",
+            "example": 1,
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookSaveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookResult"
+                }
+              }
+            },
+            "description": "修改成功"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidResult"
+                }
+              }
+            },
+            "description": "图书不存在 / 参数校验失败"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "修改图书",
+        "tags": [
+          "图书管理"
+        ]
+      }
+    },
+    "/system/health": {
+      "get": {
+        "description": "返回当前 profile、启动时间等基础信息",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultMapStringObject"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "服务健康摘要",
+        "tags": [
+          "系统运维"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "图书的增删改查，供后续订单模块引用",
+      "name": "图书管理"
+    },
+    {
+      "description": "服务自身状态，按包分组",
+      "name": "系统运维"
+    }
+  ]
+}

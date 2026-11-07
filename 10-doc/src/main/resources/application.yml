@@ -1,0 +1,26 @@
+server:
+  port: 8010
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: 10-doc
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    # 三个排序与展开参数
+    operations-sorter: method        # 接口按 HTTP 方法排序，可换 alpha（按字母）
+    tags-sorter: alpha               # 分组按名称排序
+    doc-expansion: none              # none 只展开分组标题，list 展开接口列表，full 连参数一起展开
+    display-request-duration: true   # 调试时显示耗时
+    persist-authorization: true      # Authorize 里填的 token 刷新页面后不丢
+
+# 练习 5：生产环境不公开文档 —— 见 application-prod.yml，用 --spring.profiles.active=prod 启动即可验证
+logging:
+  level:
+    top.zff06.doc: info

@@ -1,0 +1,8 @@
+# 练习 5 的落地配置：生产环境彻底关闭文档入口
+# 启动方式：java -jar 10-doc.jar --spring.profiles.active=prod
+# 验证口径：/v3/api-docs 与 /swagger-ui.html 均返回 404，业务接口照常可用
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
