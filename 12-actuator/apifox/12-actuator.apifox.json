@@ -1,0 +1,263 @@
+{
+  "apiCollection": {
+    "name": "12-actuator 应用监控验收",
+    "description": "模块 12 验收集合：健康检查 → 业务打点 → 指标查询 → Prometheus 导出 → 未暴露端点 404。\n运行前：把「环境 - 前置 URL」设为 http://127.0.0.1:8012（应用需已启动）。\n每条接口的断言都写在「后置操作 - 自定义脚本」里，跑「自动化测试」可以看到全绿。",
+    "children": [
+      {
+        "name": "01 健康检查",
+        "api": {
+          "method": "get",
+          "path": "/actuator/health",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点：自定义 InventoryHealthIndicator 被装进组件树，且带判断依据（url / latencyMs）。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "UP",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点 1：整体状态与 HTTP 200 一致\npm.test('整体状态 UP', function () {\n  pm.response.to.have.status(200);\n  pm.expect(pm.response.json().status).to.eql('UP');\n});\n\n// 验收点 2：自定义组件进了组件树，名字就是 @Component(\"inventory\")\npm.test('自定义 inventory 组件存在且 UP', function () {\n  const inv = pm.response.json().components.inventory;\n  pm.expect(inv !== undefined).to.eql(true);\n  pm.expect(inv.status).to.eql('UP');\n});\n\n// 验收点 3：健康检查不是只有 UP/DOWN，还带排查依据\npm.test('inventory 带 url 与 latencyMs 依据', function () {\n  const d = pm.response.json().components.inventory.details;\n  pm.expect(d.url).to.eql('http://inventory-service/health');\n  pm.expect(typeof d.latencyMs === 'number').to.eql(true);\n});\n\n// 验收点 4：内置组件没被覆盖掉\npm.test('内置 ping / diskSpace / livenessState 仍在', function () {\n  const c = pm.response.json().components;\n  pm.expect(c.ping.status).to.eql('UP');\n  pm.expect(c.diskSpace.status).to.eql('UP');\n  pm.expect(c.livenessState.status).to.eql('UP');\n});"
+        }
+      },
+      {
+        "name": "02 下单（打点）",
+        "api": {
+          "method": "post",
+          "path": "/business/orders",
+          "parameters": [
+            {
+              "name": "amount",
+              "value": "199",
+              "type": "string",
+              "required": true,
+              "description": "订单金额",
+              "pathParamType": "query"
+            }
+          ],
+          "auth": {},
+          "description": "验收点：业务接口正常返回，且返回体里带着耗时——这一笔会被 BusinessMetrics 记进 Counter + Timer。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点 1：业务本身正常\npm.test('下单成功，code=200', function () {\n  pm.response.to.have.status(200);\n  pm.expect(pm.response.json().code).to.eql(200);\n});\n\n// 验收点 2：订单号和时长都回来了（时长说明 Timer 那条打点确实被走到）\npm.test('返回 orderId 与 costMs', function () {\n  const d = pm.response.json().data;\n  pm.expect(d.orderId > 0).to.eql(true);\n  pm.expect(typeof d.costMs === 'number').to.eql(true);\n});"
+        }
+      },
+      {
+        "name": "03 慢请求（撑 P95）",
+        "api": {
+          "method": "get",
+          "path": "/business/slow",
+          "parameters": [
+            {
+              "name": "ms",
+              "value": "300",
+              "type": "string",
+              "required": true,
+              "description": "睡眠毫秒数",
+              "pathParamType": "query"
+            }
+          ],
+          "auth": {},
+          "description": "验收点：制造一个 300ms 的大样本。连续跑 3~5 次再去查 Timer，P95 会被明显拉高——这是演示「分位数怎么来的」最直观的一步。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：接口本身要睡够时间，否则撑不起 P95\npm.test('慢请求确实耗时 >= 300ms', function () {\n  pm.response.to.have.status(200);\n  pm.expect(pm.response.responseTime >= 300).to.eql(true);\n});"
+        }
+      },
+      {
+        "name": "04 下单失败（带标签打点）",
+        "api": {
+          "method": "get",
+          "path": "/business/fail",
+          "parameters": [
+            {
+              "name": "reason",
+              "value": "stock_empty",
+              "type": "string",
+              "required": true,
+              "description": "失败原因",
+              "pathParamType": "query"
+            }
+          ],
+          "auth": {},
+          "description": "验收点：同一个指标名按 reason 分成独立序列。把 reason 改成 pay_timeout 再点一次，之后在指标端点里能看到两条。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：失败原因是标签，不是指标名的一部分\npm.test('失败打点接口可访问', function () {\n  pm.response.to.have.status(200);\n  pm.expect(pm.response.json().data.reason).to.eql('stock_empty');\n});"
+        }
+      },
+      {
+        "name": "05 指标清单",
+        "api": {
+          "method": "get",
+          "path": "/actuator/metrics",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点：四个自定义指标都注册成功。注意 business.orders.failed 是懒注册的——跑过 04 才会出现。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：清单里四个自定义指标齐全（依赖前面 02/03/04 已执行）\npm.test('四个自定义指标都在清单里', function () {\n  const names = pm.response.json().names;\n  const expect = [\n    'business.orders.created',\n    'business.orders.failed',\n    'business.order.handle',\n    'business.orders.processing'\n  ];\n  expect.forEach(function (n) {\n    pm.expect(names.indexOf(n) >= 0).to.eql(true);\n  });\n});\n\n// 验收点：框架自带指标也在，说明 Micrometer 自动配置生效了\npm.test('自带 http.server.requests / jvm.memory.used 存在', function () {\n  const names = pm.response.json().names;\n  pm.expect(names.indexOf('http.server.requests') >= 0).to.eql(true);\n  pm.expect(names.indexOf('jvm.memory.used') >= 0).to.eql(true);\n});"
+        }
+      },
+      {
+        "name": "06 单个指标：Counter",
+        "api": {
+          "method": "get",
+          "path": "/actuator/metrics/business.orders.created",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点：Counter 只有 COUNT 一个测量值，且全局打上了 application 标签（来自 management.metrics.tags）。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点 1：计数 > 0，且统计量只有 COUNT\npm.test('Counter 有 COUNT 且大于 0', function () {\n  const m = pm.response.json().measurements;\n  pm.expect(m.length).to.eql(1);\n  pm.expect(m[0].statistic).to.eql('COUNT');\n  pm.expect(m[0].value > 0).to.eql(true);\n});\n\n// 验收点 2：全局 application 标签生效\npm.test('自动带上 application 标签', function () {\n  const tags = pm.response.json().availableTags;\n  const app = tags.filter(function (t) { return t.tag === 'application'; });\n  pm.expect(app.length).to.eql(1);\n  pm.expect(app[0].values[0]).to.eql('12-应用监控');\n});"
+        }
+      },
+      {
+        "name": "07 单个指标：Timer（按 result 筛序列）",
+        "api": {
+          "method": "get",
+          "path": "/actuator/metrics/business.order.handle",
+          "parameters": [
+            {
+              "name": "tag",
+              "value": "result:success",
+              "type": "string",
+              "required": true,
+              "description": "标签过滤，格式 key:value",
+              "pathParamType": "query"
+            }
+          ],
+          "auth": {},
+          "description": "验收点：Timer 是四件套（COUNT / TOTAL_TIME / MAX），MAX 会被 03 的 300ms 慢请求撑起来。把 tag 改成 result:failure 能看到另一条独立序列。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：Timer 有 COUNT / TOTAL_TIME / MAX 三个统计量\npm.test('Timer 四个统计量齐全', function () {\n  const stats = pm.response.json().measurements.map(function (m) { return m.statistic; });\n  pm.expect(stats.indexOf('COUNT') >= 0).to.eql(true);\n  pm.expect(stats.indexOf('TOTAL_TIME') >= 0).to.eql(true);\n  pm.expect(stats.indexOf('MAX') >= 0).to.eql(true);\n});\n\n// 验收点：按 result 过滤后只剩一条序列。\n// 注意 availableTags 在过滤后只保留「剩下的」标签——result 已被用掉，所以这里只剩 application，\n// 反过来说，看不到 result 就是过滤生效了\npm.test('?tag=result:success 后 availableTags 不再含 result', function () {\n  const tags = pm.response.json().availableTags;\n  const r = tags.filter(function (t) { return t.tag === 'result'; });\n  pm.expect(r.length).to.eql(0);\n  pm.expect(tags.length).to.eql(1);\n});\n\n// 验收点：过滤后 COUNT 只算 success 那一条，不是全部\npm.test('COUNT 与 success 序列一致', function () {\n  const m = pm.response.json().measurements.filter(function (x) { return x.statistic === 'COUNT'; });\n  pm.expect(m[0].value > 0).to.eql(true);\n});\n\n// 验收点：MAX 至少是 300ms（0.3s），证明慢请求确实进了这条序列——这就是 P95 的来源\npm.test('MAX 被 300ms 慢请求撑起来', function () {\n  const m = pm.response.json().measurements.filter(function (x) { return x.statistic === 'MAX'; });\n  pm.expect(m[0].value >= 0.25).to.eql(true);\n});"
+        }
+      },
+      {
+        "name": "08 单个指标：Gauge",
+        "api": {
+          "method": "get",
+          "path": "/actuator/metrics/business.orders.processing",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点（也是最容易被问的点）：这里永远是 0。不是没打点，是 Gauge 只在被抓取那一刻读值，而请求早就结束了。想知道它为什么是 0、什么场景才有意义，指出代码里 enter()/leave() 的位置。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：口径必须写清楚——0 是「抓取时刻没有请求在处理」，不是「没打点」\npm.test('Gauge 有值且当前为 0（请求已结束）', function () {\n  const m = pm.response.json().measurements;\n  pm.expect(m[0].statistic).to.eql('VALUE');\n  pm.expect(m[0].value).to.eql(0);\n});"
+        }
+      },
+      {
+        "name": "09 Prometheus 导出",
+        "api": {
+          "method": "get",
+          "path": "/actuator/prometheus",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点（整个模块最值得讲的一处）：代码里叫 business.orders.created，导出来却是 business_orders_total。名字被 Micrometer 的命名约定改了。自定义脚本会把这一行原文打印到控制台。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "const body = pm.response.text();\n\n// 验收点 1：计数器名的 _created 后缀被吃掉，补上 _total\npm.test('business.orders.created 导出为 business_orders_total', function () {\n  pm.expect(body.indexOf('business_orders_total') >= 0).to.eql(true);\n  pm.expect(body.indexOf('# TYPE business_orders_total counter') >= 0).to.eql(true);\n});\n\n// 验收点 2：Timer 以 summary 形式导出，分位数变成 quantile 标签\npm.test('Timer 导出为 summary + quantile 标签', function () {\n  pm.expect(body.indexOf('# TYPE business_order_handle_seconds summary') >= 0).to.eql(true);\n  pm.expect(body.indexOf('quantile=\"0.95\"') >= 0).to.eql(true);\n});\n\n// 验收点 3：带标签的失败计数，每个 reason 一行\npm.test('失败计数按 reason 拆行', function () {\n  pm.expect(body.indexOf('reason=\"stock_empty\"') >= 0).to.eql(true);\n});\n\n// 验收点 4：全局 application 标签进入每一条序列\npm.test('每条自定义序列都带 application 标签', function () {\n  const lines = body.split('\\n').filter(function (l) {\n    return l.indexOf('business_orders') === 0 || l.indexOf('business_order_handle') === 0;\n  });\n  pm.expect(lines.length > 0).to.eql(true);\n  lines.forEach(function (l) {\n    pm.expect(l.indexOf('application=\"12-应用监控\"') >= 0).to.eql(true);\n  });\n});\n\n// 把关键几行打到控制台，演示时直接念\nconst keep = body.split('\\n').filter(function (l) {\n  return l.indexOf('# TYPE business_') === 0 ||\n    (l.indexOf('business_orders_total{') === 0) ||\n    (l.indexOf('business_order_handle_seconds{') === 0 && l.indexOf('0.95') >= 0);\n});\nconsole.log('=== 关键导出行 ===');\nkeep.forEach(function (l) { console.log(l); });"
+        }
+      },
+      {
+        "name": "10 未暴露端点应 404",
+        "api": {
+          "method": "get",
+          "path": "/actuator/env",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点：安全面。/actuator/env 能读出全部配置（含密码），所以默认不暴露、这里也没写进 include。返回 404 才是正确行为。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 404,
+              "name": "未暴露",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点：没写进 exposure.include 的端点必须打不开\npm.test('env 端点未暴露，返回 404', function () {\n  pm.response.to.have.status(404);\n});\n\n// 顺带对比：已暴露的 metrics 是 200，说明不是整个 actuator 都关了\npm.sendRequest('http://127.0.0.1:8012/actuator/metrics', function (err, res) {\n  pm.test('对照：metrics 仍可访问', function () {\n    pm.expect(res.code).to.eql(200);\n  });\n});"
+        }
+      },
+      {
+        "name": "11 info 端点",
+        "api": {
+          "method": "get",
+          "path": "/actuator/info",
+          "parameters": [],
+          "auth": {},
+          "description": "验收点：AppInfoContributor 与 application.yml 里 info.* 的内容合并输出。线上多实例排查时用来确认「这台机器跑的哪个版本」。",
+          "headers": [],
+          "responses": [
+            {
+              "code": 200,
+              "name": "成功",
+              "description": ""
+            }
+          ],
+          "postscript": "// 验收点 1：代码里 InfoContributor 写的 module / owner\npm.test('InfoContributor 的 module 与 owner 生效', function () {\n  const j = pm.response.json();\n  pm.expect(j.module.name).to.eql('12-应用监控');\n  pm.expect(j.owner.team).to.eql('backend-learning');\n});\n\n// 验收点 2：application.yml 里 info.* 的静态配置也在（两种来源合并）\npm.test('application.yml 的 info.app 也在', function () {\n  const j = pm.response.json();\n  pm.expect(j.app.module).to.eql('12-actuator');\n  pm.expect(j.module.port).to.eql('8012');\n});"
+        }
+      }
+    ]
+  },
+  "environment": {
+    "name": "12-actuator 本地",
+    "values": [
+      {
+        "key": "baseUrl",
+        "value": "http://127.0.0.1:8012",
+        "enabled": true
+      }
+    ]
+  }
+}

@@ -13,6 +13,11 @@ management:
         # 默认只暴露 health，其余要显式开；生产上按需开，别用 "*"
         include: health,info,metrics,prometheus
       base-path: /actuator
+  info:
+    env:
+      # Boot 3 默认会把 info.* 配置输出到 /actuator/info，Boot 4 改成默认关闭（默认只认 InfoContributor），
+      # 不打开这里，application.yml 里那段 info.app 就不会出现在 /actuator/info 里
+      enabled: true
   endpoint:
     health:
       # always 才会显示各组件详情，默认只在未认证时显示 UP/DOWN

@@ -55,6 +55,16 @@ class ActuatorEndpointTest {
     }
 
     @Test
+    @DisplayName("info 同时输出 application.yml 里的 info.* 静态配置")
+    void infoHasStaticConfigFromYml() throws Exception {
+        // Boot 4 把 management.info.env.enabled 默认改成了 false，不显式打开这里一定是空的
+        mockMvc.perform(get("/actuator/info"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.app.module").value("12-actuator"))
+                .andExpect(jsonPath("$.app.version").value("1.0.0"));
+    }
+
+    @Test
     @DisplayName("打三次下单，计数器正好加三")
     void counterGrowsByThree() throws Exception {
         // 指标是容器级单例，别的用例可能已经打过点，所以断言差值而不是绝对值
