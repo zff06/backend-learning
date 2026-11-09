@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>stage4 · 表单登录</title>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f6f7f9; margin: 0; }
+        .wrap { max-width: 340px; margin: 80px auto; background: #fff; padding: 28px 28px 24px; border-radius: 12px; border: 1px solid #e6e8eb; }
+        h1 { font-size: 17px; font-weight: 500; margin: 0 0 6px; color: #1c1e21; }
+        p.hint { font-size: 12px; color: #7a7f87; margin: 0 0 18px; line-height: 1.6; }
+        label { display: block; font-size: 12px; color: #5b6069; margin: 12px 0 4px; }
+        input[type=text], input[type=password] { width: 100%; box-sizing: border-box; padding: 9px 11px; font-size: 13px; border: 1px solid #d8dbe0; border-radius: 8px; outline: none; }
+        input:focus { border-color: #7f77dd; }
+        button { width: 100%; margin-top: 18px; padding: 10px; font-size: 13px; color: #fff; background: #534ab7; border: 0; border-radius: 8px; cursor: pointer; }
+        .msg { margin-top: 14px; font-size: 12px; color: #a32d2d; min-height: 16px; }
+        .ok { color: #0f6e56; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>stage4 · 表单登录</h1>
+    <p class="hint">这条链用的是 Session，不是 JWT。表单必须带 CSRF token，否则 403。</p>
+
+    <form id="loginForm" action="/stage4/login" method="post">
+        <label for="username">用户名</label>
+        <input id="username" name="username" type="text" autocomplete="username" placeholder="alice">
+        <label for="password">密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="123456">
+        <input id="csrf" type="hidden" name="_csrf" value="">
+        <button type="submit">登录</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+</div>
+
+<script>
+    // CSRF token 由 /stage4/csrf 触发生成并写进 XSRF-TOKEN cookie，
+    // 页面首次加载时 cookie 里还没有值，所以显式取一次
+    fetch('/stage4/csrf')
+        .then(r => r.json())
+        .then(body => {
+            document.getElementById('csrf').value = body.data;
+        })
+        .catch(() => {
+            document.getElementById('msg').textContent = '拿不到 CSRF token';
+        });
+
+    const params = new URLSearchParams(location.search);
+    const msg = document.getElementById('msg');
+    if (params.has('error')) {
+        msg.textContent = '用户名或密码错误，或账号不可用';
+    } else if (params.has('logout')) {
+        msg.textContent = '已退出登录';
+        msg.className = 'msg ok';
+    }
+</script>
+</body>
+</html>

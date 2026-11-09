@@ -1,0 +1,19 @@
+mqxu:
+  security:
+    sms:
+      # 集成测试走内存实现：验证码逻辑已由 InMemorySmsCodeTest 覆盖，
+      # 这里不需要真实 Redis，也就不受本机 Redis 是否在跑的影响
+      store: memory
+      send-interval: 0s
+      expose-code: true
+
+spring:
+  # 排除 Redis 自动配置，避免 Lettuce 建连超时拖慢测试启动
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.data.redis.autoconfigure.RedisAutoConfiguration
+      - org.springframework.boot.data.redis.autoconfigure.RedisReactiveAutoConfiguration
+
+logging:
+  level:
+    top.mqxu.security: INFO

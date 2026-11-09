@@ -1,0 +1,62 @@
+server:
+  port: 8008
+
+spring:
+  application:
+    name: 08-认证与授权
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/backend_learning?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    # 文档里写的是 123456，那是作者的环境；本机 MySQL 口令与 05-mybatis / 06-redis 保持一致
+    password: wjzff060412
+    hikari:
+      pool-name: security-demo-pool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 3000
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      encoding: UTF-8
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: abc123
+      database: 11
+      timeout: 3s
+
+mqxu:
+  security:
+    jwt:
+      # 64 个十六进制字符 = 64 字节，hmacShaKeyFor 会选 HS512。真实项目改成 ${JWT_SECRET}
+      secret: 3f2b8d1e7c9a4f6b0d5e8a2c7f1b9d4e6a3c8f2b5d7e9a1c4f6b8d2e5a7c9f1b
+      expire-minutes: 120
+    sms:
+      # redis：验证码存 Redis（db 11）；memory：改存 ConcurrentHashMap，不连 Redis 也能跑
+      store: redis
+      # 演示开关，把验证码写在响应里；生产必须 false
+      expose-code: true
+      code-ttl: 5m
+      send-interval: 60s
+      max-fail-count: 5
+      # 演示开关，未注册手机号首次登录自动建号；真实业务要在发码前校验
+      auto-register: true
+    cors:
+      allowed-origins:
+        - http://localhost:5173
+        - http://localhost:3000
+        - http://127.0.0.1:5173
+
+logging:
+  level:
+    org.springframework.security: INFO
+    top.mqxu.security: DEBUG
+    # 排查"明明配了 permitAll 还是 401"时改成 DEBUG，能看每个请求匹配了哪条链
+    # org.springframework.security: DEBUG
